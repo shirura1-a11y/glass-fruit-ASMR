@@ -1,0 +1,28 @@
+project: glass-fruit-asmr
+duration_seconds: 70
+min_duration_seconds: 65
+max_duration_seconds: 75
+video:
+  width: 1080
+  height: 1920
+  fps: 30
+  codec: libx264
+  audio_codec: aac
+  narration: false
+  bgm: false
+cost:
+  enable_paid_api: false
+  max_usd_per_run: 0
+scenes:
+  - fruit: strawberry
+    start: 0
+    end: 15
+  - fruit: apple
+    start: 15
+    end: 32
+  - fruit: grapes
+    start: 32
+    end: 49
+  - fruit: watermelon
+    start: 49
+    end: 70
