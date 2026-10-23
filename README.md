@@ -49,3 +49,8 @@ python -m glass_fruit --config configs/prototype.yaml demo --output-dir outputs/
 必要なシステムツール: FFmpeg / ffprobe（libx264・AAC・drawtext対応）。
 GitHub Actionsは手動実行のみで、自動実行しない。利用枠・料金を確認してから実行する。
 Kling直販の条件とCreator Rewardsの現行参加要件は公式本文の確認が残っている。
+
+## 素材取り込み・音声改善の自動化
+
+ショット別プロンプト、不足素材の秒数報告、任意の硬質音EQ、実素材のActions編集・Artifacts取得を追加。
+[手順・API調査の制約・参考費用](docs/automation.md)を参照。生成API呼び出しは未実装、有料利用は事前承認が必要。

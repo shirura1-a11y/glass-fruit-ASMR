@@ -133,7 +133,10 @@ def read_manifest(path, cfg):
                     raise ValueError("Source audio has no overlap with the clip")
             elif offset != 0:
                 raise ValueError("Cannot offset a silent source")
-            clips.append({"video": video_path, "audio": audio_path, "has_audio": has_audio,
+            profile = entry.get("audio_profile", "original")
+            if profile not in ("original", "glass-bright"):
+                raise ValueError("Unknown audio profile")
+            clips.append({"audio_profile": profile, "video": video_path, "audio": audio_path, "has_audio": has_audio,
                           "duration": seconds, "video_start": start, "audio_offset": offset})
             total += seconds
         if abs(total - (planned["end"] - planned["start"])) > 1e-6:
@@ -160,6 +163,8 @@ def normalize(clip, cfg, output):
         af += f",atrim=start={-offset},asetpts=PTS-STARTPTS"
     elif offset > 0:
         af += f",adelay={round(offset * 1000)}:all=1"
+    if clip.get("audio_profile", "original") == "glass-bright":
+        af += ",highpass=f=180,equalizer=f=3200:t=q:w=1:g=4,alimiter=limit=0.89:level=false:latency=true"
     af += f",apad,atrim=duration={duration},asetpts=PTS-STARTPTS"
     vf = (f"scale={video['width']}:{video['height']}:force_original_aspect_ratio=decrease,"
           f"pad={video['width']}:{video['height']}:(ow-iw)/2:(oh-ih)/2,"
@@ -193,6 +198,8 @@ def assemble(manifest_path, cfg, output):
         report["path"] = str(output)
         report["synthetic_demo"] = manifest.get("synthetic_demo") is True
         report["source_clips"] = len(clips)
+        report["audio_profiles"] = sorted({c["audio_profile"] for c in clips})
+        report["audio_quality_reviewed"] = False
         target.rename(output)
         report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return report

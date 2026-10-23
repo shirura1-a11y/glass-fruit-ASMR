@@ -4,6 +4,7 @@ import sys
 
 import yaml
 
+from .automation import prepare, shot_plan
 from .config import load_config, prompts
 from .media import assemble, demo, validate
 
@@ -20,10 +21,23 @@ def main(argv=None):
     edit_cmd.add_argument("--output", required=True)
     check_cmd = commands.add_parser("validate", help="Probe and fully decode an existing MP4")
     check_cmd.add_argument("video")
+    plan_cmd = commands.add_parser("plan", help="Offline per-shot video and glass-audio prompts")
+    plan_cmd.add_argument("--fruit", choices=["strawberry", "apple", "grapes", "watermelon"])
+    plan_cmd.add_argument("--shot-seconds", type=int, default=8)
+    prepare_cmd = commands.add_parser("prepare", help="Inventory fruit/*.mp4 and prepare a non-looping manifest")
+    prepare_cmd.add_argument("--assets", required=True)
+    prepare_cmd.add_argument("--output-dir", required=True)
+    prepare_cmd.add_argument("--audio-profile", choices=["original", "glass-bright"], default="original")
     args = parser.parse_args(argv)
     try:
         cfg = load_config(args.config)
-        if args.command == "prompts":
+        if args.command == "plan":
+            result = shot_plan(cfg, args.fruit, args.shot_seconds)
+        elif args.command == "prepare":
+            result = prepare(cfg, args.assets, args.output_dir, args.audio_profile)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 0 if result["status"] == "ready-to-assemble" else 2
+        elif args.command == "prompts":
             result = prompts(cfg)
         elif args.command == "demo":
             result = demo(cfg, args.output_dir)

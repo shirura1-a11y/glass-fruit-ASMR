@@ -1,0 +1,96 @@
+name: Assemble local fruit assets
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Successful workflow run ID containing the local-fruit-assets artifact
+        required: false
+        type: string
+      source_release_tag:
+        description: Alternatively use a release containing fruit-assets.zip (leave run ID empty)
+        required: false
+        type: string
+      config:
+        description: Timeline
+        type: choice
+        options: [config.yaml, configs/prototype.yaml]
+        default: config.yaml
+      audio_profile:
+        description: Original audio or optional glass brightness EQ (listening review required)
+        type: choice
+        options: [original, glass-bright]
+        default: original
+permissions:
+  contents: read
+  actions: read
+jobs:
+  assemble:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CONFIG: ${{ inputs.config }}
+      AUDIO_PROFILE: ${{ inputs.audio_profile }}
+      SOURCE_RUN: ${{ inputs.source_run_id }}
+      SOURCE_TAG: ${{ inputs.source_release_tag }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes ffmpeg
+          python -m pip install -r requirements.txt
+      - name: Check source choice
+        run: |
+          if [ -n "$SOURCE_RUN" ] && [ -z "$SOURCE_TAG" ]; then
+            [[ "$SOURCE_RUN" =~ ^[0-9]+$ ]]
+          elif [ -z "$SOURCE_RUN" ] && [ -n "$SOURCE_TAG" ]; then
+            [[ "$SOURCE_TAG" != -* ]]
+          else
+            echo 'Specify exactly one source: run ID or release tag'; exit 1
+          fi
+      - name: Download release assets
+        if: ${{ inputs.source_release_tag != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download "$SOURCE_TAG" --repo "$GITHUB_REPOSITORY" --pattern fruit-assets.zip --dir /tmp/fruit-input
+          python - <<'PY'
+          from pathlib import Path
+          import zipfile
+          root = Path('assets').resolve()
+          with zipfile.ZipFile('/tmp/fruit-input/fruit-assets.zip') as archive:
+              if sum(x.file_size for x in archive.infolist()) > 2_000_000_000:
+                  raise ValueError('Archive exceeds 2 GB')
+              for entry in archive.infolist():
+                  path = (root / entry.filename).resolve()
+                  if not path.is_relative_to(root):
+                      raise ValueError('Unsafe archive path')
+              archive.extractall(root)
+          PY
+      - uses: actions/download-artifact@v4
+        if: ${{ inputs.source_run_id != '' }}
+        with:
+          name: local-fruit-assets
+          path: assets
+          run-id: ${{ inputs.source_run_id }}
+          github-token: ${{ github.token }}
+      - name: Test
+        run: python -m unittest discover -s tests -v
+      - name: Prepare and assemble
+        run: |
+          set -euo pipefail
+          case "$CONFIG" in config.yaml|configs/prototype.yaml) ;; *) exit 1 ;; esac
+          case "$AUDIO_PROFILE" in original|glass-bright) ;; *) exit 1 ;; esac
+          python -m glass_fruit --config "$CONFIG" prepare --assets assets --output-dir outputs/prepared --audio-profile "$AUDIO_PROFILE"
+          python -m glass_fruit --config "$CONFIG" assemble --manifest outputs/prepared/manifest.json --output outputs/GLASS-FRUIT.mp4
+          python -m glass_fruit --config "$CONFIG" validate outputs/GLASS-FRUIT.mp4
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: glass-fruit-edit-${{ github.run_id }}
+          path: outputs/
+          if-no-files-found: warn
+          retention-days: 7
