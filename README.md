@@ -60,3 +60,6 @@ MP4はZIPにせず、そのままGitHub Releaseへ添付して取り込めます
 
 [7種類×10秒のYouTube Shorts制作](docs/shorts-seven.md)に対応。
 既存イチゴと残り6種類を同じReleaseへ追加し、専用Actionsで不足確認・70秒結合・Artifacts保存を実行できます。
+
+[Runway APIの仕様・予算・課金しない自動制作モック](docs/runway-automation.md)を追加。
+モックActionsは素材アップロード不要で7種類×10秒の処理を検証します。実課金経路は承認・料金確認まで無効です。

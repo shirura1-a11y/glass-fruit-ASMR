@@ -1,0 +1,29 @@
+{
+  "checked_date_jst": "2026-10-23",
+  "generation_api_requests": 0,
+  "sources": [
+    {
+      "url": "https://raw.githubusercontent.com/runwayml/openapi/main/openapi.json",
+      "status": "retrieved",
+      "bytes": 1378677,
+      "sha256": "287adbf67df4328215aaa1cf0b330e29333751ef4cdd08a622d8553df9984f5c"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/runwayml/sdk-python/main/src/runwayml/types/text_to_video_create_params.py",
+      "status": "retrieved",
+      "bytes": 36261,
+      "sha256": "0ee47aeffbc905b02413372d48dc9ffbc2e52d1b7661be6aba0142e974570b9a"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/runwayml/sdk-python/main/src/runwayml/resources/tasks.py",
+      "status": "retrieved",
+      "bytes": 10488,
+      "sha256": "c2e9c2f81e627ffa9ebb0db995a362eb54c240b62afbbd1f1f5b6b093037e3ca"
+    },
+    {
+      "url": "https://docs.dev.runwayml.com/guides/pricing/",
+      "status": "proxy-403",
+      "note": "Current per-model price not verified"
+    }
+  ]
+}

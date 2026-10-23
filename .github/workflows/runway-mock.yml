@@ -1,0 +1,70 @@
+name: Runway automatic production - offline mock
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Plan only or labeled synthetic end-to-end mock (never paid API)
+        type: choice
+        options: [plan, mock]
+        default: mock
+      resume_run_id:
+        description: Optional prior run ID to restore its complete mock checkpoint
+        type: string
+        required: false
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: runway-mock-production
+  cancel-in-progress: false
+jobs:
+  produce:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      MODE: ${{ inputs.mode }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes ffmpeg
+          python -m pip install -r requirements.txt
+      - name: Restore explicit mock checkpoint
+        if: ${{ inputs.resume_run_id != '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: runway-mock-checkpoint
+          run-id: ${{ inputs.resume_run_id }}
+          github-token: ${{ github.token }}
+          path: outputs/runway-mock
+      - name: Test
+        run: python -m unittest discover -s tests -v
+      - name: Produce without API access
+        run: |
+          set -euo pipefail
+          case "$MODE" in plan|mock) ;; *) exit 1 ;; esac
+          mkdir -p outputs
+          python -m glass_fruit.generate --mode "$MODE" --output-dir outputs/runway-mock > outputs/generation-report.json
+      - name: Retain complete mock checkpoint
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: runway-mock-checkpoint
+          path: outputs/runway-mock/
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Downloadable mock result and report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: SYNTHETIC-MOCK-NOT-AI-FOOTAGE-${{ github.run_id }}
+          path: |
+            outputs/runway-mock/SYNTHETIC-MOCK-70S.mp4
+            outputs/generation-report.json
+            outputs/runway-mock/run-report.json
+          if-no-files-found: warn
+          retention-days: 7
