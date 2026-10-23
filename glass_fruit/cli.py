@@ -1,10 +1,12 @@
 import argparse
 import json
 import sys
+import zipfile
 
 import yaml
 
 from .automation import prepare, shot_plan
+from .import_assets import import_assets
 from .config import load_config, prompts
 from .media import assemble, demo, validate
 
@@ -28,10 +30,16 @@ def main(argv=None):
     prepare_cmd.add_argument("--assets", required=True)
     prepare_cmd.add_argument("--output-dir", required=True)
     prepare_cmd.add_argument("--audio-profile", choices=["original", "glass-bright"], default="original")
+    import_cmd = commands.add_parser("import-assets", help="Import direct Release MP4s or a legacy ZIP")
+    import_cmd.add_argument("--source", required=True)
+    import_cmd.add_argument("--assets", required=True)
+    import_cmd.add_argument("--fruit", choices=["strawberry", "apple", "grapes", "watermelon"], default="strawberry")
     args = parser.parse_args(argv)
     try:
         cfg = load_config(args.config)
-        if args.command == "plan":
+        if args.command == "import-assets":
+            result = import_assets(args.source, args.assets, args.fruit)
+        elif args.command == "plan":
             result = shot_plan(cfg, args.fruit, args.shot_seconds)
         elif args.command == "prepare":
             result = prepare(cfg, args.assets, args.output_dir, args.audio_profile)
@@ -47,6 +55,6 @@ def main(argv=None):
             result = validate(args.video, cfg)
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0
-    except (ValueError, OSError, yaml.YAMLError, ZeroDivisionError) as exc:
+    except (ValueError, OSError, yaml.YAMLError, ZeroDivisionError, zipfile.BadZipFile) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1

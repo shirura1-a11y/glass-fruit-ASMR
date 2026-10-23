@@ -54,3 +54,6 @@ Kling直販の条件とCreator Rewardsの現行参加要件は公式本文の確
 
 ショット別プロンプト、不足素材の秒数報告、任意の硬質音EQ、実素材のActions編集・Artifacts取得を追加。
 [手順・API調査の制約・参考費用](docs/automation.md)を参照。生成API呼び出しは未実装、有料利用は事前承認が必要。
+
+MP4はZIPにせず、そのままGitHub Releaseへ添付して取り込めます。
+[スマートフォン向け取り込み手順](docs/upload-guide.md)を参照してください。

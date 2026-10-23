@@ -92,17 +92,20 @@ AI生成する場合はショット計画の `audio_prompt` を使い、湿っ�
 
 `.github/workflows/assemble-local.yml` は手動のみで、生成APIを呼ばない。
 素材を一度渡せば、その後の素材検査・結合・技術検査・Artifactsへの保存を実行する。
-入力は次のいずれか1つ。
+入力は次のいずれか1つ。ZIPは必須ではない。
 
-1. GitHubのReleaseに、果物別フォルダを直下に入れた `fruit-assets.zip` を手動アップロードし、
-   `source_release_tag` にそのタグを指定する。既存動画を使う試作は `configs/prototype.yaml` を選ぶ。
+1. **推奨: ReleaseにMP4をそのまま添付**し、`source_release_tag` と `fruit` を指定する。
+   `VID_20261023.MP4` など元のファイル名でよい。フォルダ分けも不要。
+   既存の `fruit-assets.zip` も利用できるが、同じReleaseに直接添付したMP4があればそちらを優先する。
 2. 同じリポジトリの別のワークフローがアップロードした `local-fruit-assets` artifactの実行IDを
-   `source_run_id` に指定する。Artifactsのブラウザからの直接アップロード機能はない。
+   `source_run_id` に指定する。この場合はReleaseタグを空欄にする。
+
+スマートフォン向けの詳しい手順は [MP4取り込みガイド](upload-guide.md) を参照。
 
 成功した実行のArtifactsから `glass-fruit-edit-<run_id>` をダウンロードする。
 完成MP4と検査レポートが入る。不足時は完成MP4を作らず、不足レポートを残す。
 既存の合成デモ用ワークフローは維持。Releaseへの自動公開やリモートActions起動は今回行っていない。
-一度の素材アップロードは手動で、果物名だけから生成→完成までの全自動化は未達。
+素材をReleaseに追加する操作は手動で、果物名だけから生成→完成までの全自動化は未達。
 公式APIの仕様確認・事前の費用承認・認証設定・品質評価後に接続する必要がある。
 
 ## 今回の検証
