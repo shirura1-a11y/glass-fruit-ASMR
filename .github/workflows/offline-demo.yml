@@ -1,0 +1,57 @@
+name: Offline media checks and synthetic demo
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Synthetic test only (never calls a generation API)
+        type: choice
+        required: true
+        default: prototype
+        options:
+          - prototype
+          - timeline-70s
+
+permissions:
+  contents: read
+
+jobs:
+  offline-demo:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      TARGET: ${{ inputs.target }}
+      PIP_DISABLE_PIP_VERSION_CHECK: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install offline editing tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes ffmpeg
+          python -m pip install -r requirements.txt
+      - name: Test editing and failure handling
+        run: python -m unittest discover -s tests -v
+      - name: Generate and validate synthetic demo
+        run: |
+          set -euo pipefail
+          case "$TARGET" in
+            prototype) config=configs/prototype.yaml ;;
+            timeline-70s) config=config.yaml ;;
+            *) echo 'Unsupported target' >&2; exit 1 ;;
+          esac
+          mkdir -p outputs
+          python -m glass_fruit --config "$config" prompts > outputs/prompts.json
+          python -m glass_fruit --config "$config" demo --output-dir outputs/demo
+          python -m glass_fruit --config "$config" validate outputs/demo/SYNTHETIC-DEMO.mp4
+          cp "$config" outputs/used-config.yaml
+      - name: Upload synthetic test media and reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: SYNTHETIC-NOT-AI-FOOTAGE-${{ inputs.target }}-${{ github.run_id }}
+          path: outputs/
+          if-no-files-found: error
+          retention-days: 7

@@ -1,0 +1,124 @@
+{
+  "checked_date_jst": "2026-10-23",
+  "generation_api_requests": 0,
+  "note": "Hashes identify retrieved source bodies; full third-party pages are not committed. Partial or blocked sources must not be cited as verified facts.",
+  "sources": [
+    {
+      "id": "R1",
+      "requested_url": "https://docs.dev.runwayml.com/guides/pricing/",
+      "status": "retrieved",
+      "observation": "API credits and per-model video prices",
+      "body_bytes": 88974,
+      "body_sha256": "be2f35a12222a1dd04265c11c850c454a158852e52c316e70a25e8a88fe641af"
+    },
+    {
+      "id": "R2",
+      "requested_url": "https://raw.githubusercontent.com/runwayml/sdk-python/main/src/runwayml/types/text_to_video_create_params.py",
+      "status": "retrieved",
+      "observation": "Official SDK input types; main is mutable and not a guarantee of live model access",
+      "body_bytes": 36261,
+      "body_sha256": "0ee47aeffbc905b02413372d48dc9ffbc2e52d1b7661be6aba0142e974570b9a"
+    },
+    {
+      "id": "R3",
+      "requested_url": "https://help.runwayml.com/hc/en-us/articles/21668707517587-Can-I-use-the-content-I-made-in-Runway-for-commercial-purposes",
+      "status": "retrieved",
+      "observation": "Commercial-use FAQ; actual article title verified",
+      "body_bytes": 30742,
+      "body_sha256": "f4202f964d9d630a6d3bc57e973eb68766a01515dfa2322cabea783a83a0f85f"
+    },
+    {
+      "id": "G1",
+      "requested_url": "https://ai.google.dev/gemini-api/docs/video",
+      "status": "retrieved",
+      "observation": "Veo Preview shutdown on 2026-10-22, migration to Omni or Cloud GA",
+      "body_bytes": 90656,
+      "body_sha256": "16b4e280bd8f3f00a1002f57f8c7bacf1f1e604e60a13d3aa54f026c0033b3d3"
+    },
+    {
+      "id": "G2",
+      "requested_url": "https://ai.google.dev/gemini-api/docs/pricing",
+      "status": "retrieved",
+      "observation": "Omni input/output token pricing, unavailable API Free Tier",
+      "body_bytes": 253703,
+      "body_sha256": "c437f2f7554380ad85e8971b601bf489fbe9347a21346c956a0e58de94bbe9f8"
+    },
+    {
+      "id": "G3",
+      "requested_url": "https://ai.google.dev/gemini-api/docs/omni",
+      "status": "retrieved",
+      "observation": "Portrait, resolution, audio, watermarking and limitations",
+      "body_bytes": 659821,
+      "body_sha256": "70c7b07be83d986164ef9fbff607a9a32a89be02dc391c8968c0cb098f241609"
+    },
+    {
+      "id": "G4",
+      "requested_url": "https://ai.google.dev/gemini-api/terms",
+      "status": "retrieved",
+      "observation": "Generated-content ownership and data-use provisions",
+      "body_bytes": 113282,
+      "body_sha256": "c8cc197505cf983b7d1c45989a9c007942415aa02a999b770f95c15a00bc2163"
+    },
+    {
+      "id": "G5",
+      "requested_url": "https://cloud.google.com/vertex-ai/generative-ai/pricing",
+      "status": "retrieved",
+      "observation": "Redirects to Gemini Enterprise Agent Platform pricing; retrieved Veo table shows unit count",
+      "final_url": "https://cloud.google.com/gemini-enterprise-agent-platform/generative-ai/pricing",
+      "body_bytes": 3627515,
+      "body_sha256": "a4d441a3f4a82ed60878ff39c64848475ded8767d8cce48bdb2ff73c19d97d5a"
+    },
+    {
+      "id": "G6",
+      "requested_url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/veo/3-1-generate",
+      "status": "blocked",
+      "observation": "HTTPS tunnel returned 403; model specification not verified"
+    },
+    {
+      "id": "K1",
+      "requested_url": "https://app.klingai.com/global/dev/document-api/quickStart/productIntroduction/overview",
+      "status": "blocked",
+      "observation": "HTTPS tunnel returned 403; direct API specs and terms not verified"
+    },
+    {
+      "id": "K2",
+      "requested_url": "https://app.klingai.com/global/dev/document-api/productBilling/prePaidResourcePackage",
+      "status": "blocked",
+      "observation": "HTTPS tunnel returned 403; direct pricing and free tier not verified"
+    },
+    {
+      "id": "T1",
+      "requested_url": "https://www.tiktok.com/community-guidelines/en/integrity-authenticity",
+      "status": "retrieved",
+      "observation": "Body contains current realistic AIGC labeling and unoriginal-content policies",
+      "final_url": "https://www.tiktok.com/safety/en/policies-and-engagement/integrity-authenticity",
+      "body_bytes": 1101302,
+      "body_sha256": "681f0c75f2315fe09eed69c1180ccb1e6ac117e7d9c872cc0cebcb4858a0b343"
+    },
+    {
+      "id": "T2",
+      "requested_url": "https://support.tiktok.com/en/using-tiktok/creating-videos/ai-generated-content",
+      "status": "incomplete",
+      "observation": "HTTP 200 returned a JS shell with no help article body; not evidence of current help contents",
+      "body_bytes": 35546,
+      "body_sha256": "8374797fbd1ed773359378a33004da30006a4727bee9dbdf9bac4fd695b76802"
+    },
+    {
+      "id": "T3",
+      "requested_url": "https://support.tiktok.com/en/business-and-creator/creator-rewards-program/creator-rewards-program",
+      "status": "incomplete",
+      "observation": "HTTP 200 returned a JS shell with no help article body; no eligibility thresholds verified",
+      "body_bytes": 35550,
+      "body_sha256": "1c10173a9dec785155ee65e1710e9bcb92975efe5ff2c995b541fe47e451596b"
+    },
+    {
+      "id": "T4",
+      "requested_url": "https://www.tiktok.com/creators/creator-portal/en-us/getting-paid-to-create/creator-rewards-program/",
+      "status": "incomplete",
+      "observation": "Redirects to generic Creator Academy landing page",
+      "final_url": "https://www.tiktok.com/creator-academy",
+      "body_bytes": 670931,
+      "body_sha256": "7bf32d13e3701d3ca49920a6d26a040f11493892981ff642cc8d319d4fe587d4"
+    }
+  ]
+}

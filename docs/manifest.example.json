@@ -1,0 +1,12 @@
+{
+  "scenes": [
+    {
+      "fruit": "strawberry",
+      "clips": [
+        {"video": "../local-media/contact.mp4", "duration": 2, "video_start": 0},
+        {"video": "../local-media/fracture.mp4", "audio": "../local-media/fracture.wav", "audio_offset": 0.1, "duration": 2},
+        {"video": "../local-media/separation.mp4", "duration": 2, "video_start": 1}
+      ]
+    }
+  ]
+}

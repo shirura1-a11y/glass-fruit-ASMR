@@ -1,0 +1,20 @@
+# Six-second strawberry target. A synthetic demo does not prove visual quality.
+project: glass-fruit-asmr-prototype
+duration_seconds: 6
+min_duration_seconds: 5
+max_duration_seconds: 10
+video:
+  width: 1080
+  height: 1920
+  fps: 30
+  codec: libx264
+  audio_codec: aac
+  narration: false
+  bgm: false
+cost:
+  enable_paid_api: false
+  max_usd_per_run: 0
+scenes:
+  - fruit: strawberry
+    start: 0
+    end: 6
