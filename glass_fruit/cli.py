@@ -7,7 +7,7 @@ import yaml
 
 from .automation import prepare, shot_plan
 from .import_assets import import_assets
-from .config import load_config, prompts
+from .config import FRUITS, load_config, prompts
 from .media import assemble, demo, validate
 
 
@@ -24,7 +24,7 @@ def main(argv=None):
     check_cmd = commands.add_parser("validate", help="Probe and fully decode an existing MP4")
     check_cmd.add_argument("video")
     plan_cmd = commands.add_parser("plan", help="Offline per-shot video and glass-audio prompts")
-    plan_cmd.add_argument("--fruit", choices=["strawberry", "apple", "grapes", "watermelon"])
+    plan_cmd.add_argument("--fruit", choices=list(FRUITS))
     plan_cmd.add_argument("--shot-seconds", type=int, default=8)
     prepare_cmd = commands.add_parser("prepare", help="Inventory fruit/*.mp4 and prepare a non-looping manifest")
     prepare_cmd.add_argument("--assets", required=True)
@@ -33,7 +33,7 @@ def main(argv=None):
     import_cmd = commands.add_parser("import-assets", help="Import direct Release MP4s or a legacy ZIP")
     import_cmd.add_argument("--source", required=True)
     import_cmd.add_argument("--assets", required=True)
-    import_cmd.add_argument("--fruit", choices=["strawberry", "apple", "grapes", "watermelon"], default="strawberry")
+    import_cmd.add_argument("--fruit", choices=list(FRUITS), default="strawberry")
     args = parser.parse_args(argv)
     try:
         cfg = load_config(args.config)

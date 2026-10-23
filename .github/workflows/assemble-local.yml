@@ -13,17 +13,34 @@ on:
       fruit:
         description: Fruit for MP4s with ordinary camera/export filenames
         type: choice
-        options: [strawberry, apple, grapes, watermelon]
+        options: [strawberry, apple, grapes, watermelon, orange, kiwi, peach]
         default: strawberry
       config:
-        description: 6-second strawberry preview (default) or 70-second four-fruit timeline
+        description: Six-second preview, original four-fruit timeline, or seven-fruit Shorts
         type: choice
-        options: [configs/prototype.yaml, config.yaml]
+        options: [configs/prototype.yaml, config.yaml, configs/shorts-seven.yaml]
         default: configs/prototype.yaml
       audio_profile:
         description: Original audio or optional glass brightness EQ (listening review required)
         type: choice
         options: [original, glass-bright]
+        default: original
+  workflow_call:
+    inputs:
+      source_release_tag:
+        type: string
+        required: true
+      source_run_id:
+        type: string
+        default: ''
+      fruit:
+        type: string
+        default: strawberry
+      config:
+        type: string
+        default: configs/prototype.yaml
+      audio_profile:
+        type: string
         default: original
 permissions:
   contents: read
@@ -40,6 +57,8 @@ jobs:
       FRUIT: ${{ inputs.fruit }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'release' && 'main' || github.ref }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -78,7 +97,7 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Save independent six-second strawberry preview
         id: preview
-        if: ${{ inputs.config == 'config.yaml' && inputs.fruit == 'strawberry' }}
+        if: ${{ inputs.config != 'configs/prototype.yaml' && inputs.fruit == 'strawberry' }}
         continue-on-error: true
         run: |
           set -euo pipefail
@@ -88,7 +107,7 @@ jobs:
       - name: Prepare and assemble
         run: |
           set -euo pipefail
-          case "$CONFIG" in config.yaml|configs/prototype.yaml) ;; *) exit 1 ;; esac
+          case "$CONFIG" in config.yaml|configs/prototype.yaml|configs/shorts-seven.yaml) ;; *) exit 1 ;; esac
           case "$AUDIO_PROFILE" in original|glass-bright) ;; *) exit 1 ;; esac
           python -m glass_fruit --config "$CONFIG" prepare --assets assets --output-dir outputs/prepared --audio-profile "$AUDIO_PROFILE"
           python -m glass_fruit --config "$CONFIG" assemble --manifest outputs/prepared/manifest.json --output outputs/GLASS-FRUIT.mp4
@@ -102,6 +121,14 @@ jobs:
         with:
           name: strawberry-6s-${{ github.run_id }}
           path: outputs/STRAWBERRY-6S.mp4
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload completed seven-fruit Shorts MP4
+        if: ${{ success() && inputs.config == 'configs/shorts-seven.yaml' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-shorts-70s-${{ github.run_id }}
+          path: outputs/GLASS-FRUIT.mp4
           if-no-files-found: error
           retention-days: 7
       - uses: actions/upload-artifact@v4
@@ -131,6 +158,8 @@ jobs:
                   lines.append('- ' + entry['fruit'] + ': あと ' + str(entry['missing_seconds']) + '秒の別素材が必要')
           if Path('outputs/GLASS-FRUIT.mp4').exists():
               lines.append('完成MP4: `GLASS-FRUIT.mp4`。再生して音と映像を確認してください。')
+              if os.environ['CONFIG'] == 'configs/shorts-seven.yaml':
+                  lines.append('70秒Shorts専用: **Artifacts → youtube-shorts-70s-' + os.environ['GITHUB_RUN_ID'] + '**')
           else:
               lines.append('選択した本編は未完成です。6秒版の有無は上記を確認し、不足素材または実行ログを確認してください。')
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as handle:

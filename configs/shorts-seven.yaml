@@ -1,0 +1,37 @@
+project: glass-fruit-youtube-shorts-seven
+duration_seconds: 70
+min_duration_seconds: 70
+max_duration_seconds: 70
+video:
+  width: 1080
+  height: 1920
+  fps: 30
+  codec: libx264
+  audio_codec: aac
+  narration: false
+  bgm: false
+cost:
+  enable_paid_api: false
+  max_usd_per_run: 0
+scenes:
+- fruit: strawberry
+  start: 0
+  end: 10
+- fruit: apple
+  start: 10
+  end: 20
+- fruit: grapes
+  start: 20
+  end: 30
+- fruit: watermelon
+  start: 30
+  end: 40
+- fruit: orange
+  start: 40
+  end: 50
+- fruit: kiwi
+  start: 50
+  end: 60
+- fruit: peach
+  start: 60
+  end: 70

@@ -57,3 +57,6 @@ Kling直販の条件とCreator Rewardsの現行参加要件は公式本文の確
 
 MP4はZIPにせず、そのままGitHub Releaseへ添付して取り込めます。
 [スマートフォン向け取り込み手順](docs/upload-guide.md)を参照してください。
+
+[7種類×10秒のYouTube Shorts制作](docs/shorts-seven.md)に対応。
+既存イチゴと残り6種類を同じReleaseへ追加し、専用Actionsで不足確認・70秒結合・Artifacts保存を実行できます。

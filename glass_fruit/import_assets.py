@@ -11,7 +11,10 @@ from .config import FRUITS
 ALIASES = {'strawberry': 'strawberry', 'イチゴ': 'strawberry', 'いちご': 'strawberry',
            'apple': 'apple', 'リンゴ': 'apple', 'りんご': 'apple',
            'grapes': 'grapes', 'grape': 'grapes', 'ブドウ': 'grapes', 'ぶどう': 'grapes',
-           'watermelon': 'watermelon', 'スイカ': 'watermelon', 'すいか': 'watermelon'}
+           'watermelon': 'watermelon', 'スイカ': 'watermelon', 'すいか': 'watermelon',
+           'orange': 'orange', 'オレンジ': 'orange',
+           'kiwi': 'kiwi', 'キウイ': 'kiwi',
+           'peach': 'peach', '桃': 'peach', 'もも': 'peach'}
 MAX_BYTES = 2_000_000_000
 
 

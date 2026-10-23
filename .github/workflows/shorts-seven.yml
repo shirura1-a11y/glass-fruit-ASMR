@@ -1,0 +1,26 @@
+name: Seven-fruit YouTube Shorts
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Release containing default.mp4 and the other fruit MP4s
+        type: string
+        default: assets-001
+        required: true
+  release:
+    types: [published, edited]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: shorts-seven-${{ inputs.release_tag || github.event.release.tag_name }}
+  cancel-in-progress: false
+jobs:
+  assemble:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.release.tag_name == 'assets-001' }}
+    uses: ./.github/workflows/assemble-local.yml
+    with:
+      source_release_tag: ${{ inputs.release_tag || github.event.release.tag_name }}
+      config: configs/shorts-seven.yaml
+      fruit: strawberry
+      audio_profile: original

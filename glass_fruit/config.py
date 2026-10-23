@@ -4,7 +4,7 @@ from pathlib import Path
 
 import yaml
 
-FRUITS = {"strawberry": "strawberry", "apple": "apple", "grapes": "cluster of grapes", "watermelon": "watermelon"}
+FRUITS = {"strawberry": "strawberry", "apple": "apple", "grapes": "cluster of grapes", "watermelon": "watermelon", "orange": "orange", "kiwi": "kiwi fruit", "peach": "peach"}
 
 
 def number(value, name, low=0):
