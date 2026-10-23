@@ -16,10 +16,10 @@ on:
         options: [strawberry, apple, grapes, watermelon]
         default: strawberry
       config:
-        description: Timeline
+        description: 6-second strawberry preview (default) or 70-second four-fruit timeline
         type: choice
-        options: [config.yaml, configs/prototype.yaml]
-        default: config.yaml
+        options: [configs/prototype.yaml, config.yaml]
+        default: configs/prototype.yaml
       audio_profile:
         description: Original audio or optional glass brightness EQ (listening review required)
         type: choice
@@ -76,6 +76,15 @@ jobs:
           github-token: ${{ github.token }}
       - name: Test
         run: python -m unittest discover -s tests -v
+      - name: Save independent six-second strawberry preview
+        id: preview
+        if: ${{ inputs.config == 'config.yaml' && inputs.fruit == 'strawberry' }}
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          python -m glass_fruit --config configs/prototype.yaml prepare --assets assets --output-dir outputs/strawberry-preview --audio-profile original
+          python -m glass_fruit --config configs/prototype.yaml assemble --manifest outputs/strawberry-preview/manifest.json --output outputs/STRAWBERRY-6S.mp4
+          python -m glass_fruit --config configs/prototype.yaml validate outputs/STRAWBERRY-6S.mp4
       - name: Prepare and assemble
         run: |
           set -euo pipefail
@@ -84,6 +93,17 @@ jobs:
           python -m glass_fruit --config "$CONFIG" prepare --assets assets --output-dir outputs/prepared --audio-profile "$AUDIO_PROFILE"
           python -m glass_fruit --config "$CONFIG" assemble --manifest outputs/prepared/manifest.json --output outputs/GLASS-FRUIT.mp4
           python -m glass_fruit --config "$CONFIG" validate outputs/GLASS-FRUIT.mp4
+      - name: Save default six-second preview filename
+        if: ${{ success() && inputs.config == 'configs/prototype.yaml' }}
+        run: cp outputs/GLASS-FRUIT.mp4 outputs/STRAWBERRY-6S.mp4
+      - name: Upload six-second MP4
+        if: ${{ always() && hashFiles('outputs/STRAWBERRY-6S.mp4') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: strawberry-6s-${{ github.run_id }}
+          path: outputs/STRAWBERRY-6S.mp4
+          if-no-files-found: error
+          retention-days: 7
       - uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
@@ -102,6 +122,8 @@ jobs:
           if imported.exists():
               report = json.loads(imported.read_text())
               lines.append('取り込み: ' + str(len(report['files'])) + '本（' + report['mode'] + '）')
+          if Path('outputs/STRAWBERRY-6S.mp4').exists():
+              lines.append('6秒のイチゴ版は完成しました。**Artifacts → strawberry-6s-' + os.environ['GITHUB_RUN_ID'] + '** に `STRAWBERRY-6S.mp4` があります。70秒版の不足とは独立して取得できます。')
           missing = Path('outputs/prepared/asset-report.json')
           if missing.exists():
               report = json.loads(missing.read_text())
@@ -110,7 +132,7 @@ jobs:
           if Path('outputs/GLASS-FRUIT.mp4').exists():
               lines.append('完成MP4: `GLASS-FRUIT.mp4`。再生して音と映像を確認してください。')
           else:
-              lines.append('完成MP4はまだありません。上の不足内容または実行ログを確認してください。')
+              lines.append('選択した本編は未完成です。6秒版の有無は上記を確認し、不足素材または実行ログを確認してください。')
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as handle:
               handle.write('\n\n'.join(lines) + '\n')
           PY
