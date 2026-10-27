@@ -1,0 +1,56 @@
+name: Muse seven-fruit TikTok
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - scripts/edit_muse.py
+      - .github/workflows/muse-tiktok.yml
+      - 'media-generation-glass-*.mp4'
+permissions:
+  contents: write
+concurrency:
+  group: muse-tiktok
+  cancel-in-progress: false
+jobs:
+  edit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes ffmpeg
+      - name: Edit original Muse footage
+        run: python scripts/edit_muse.py
+      - name: Retain editing report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: muse-edit-report-${{ github.run_id }}
+          path: outputs/muse-tiktok/edit-report.json
+          if-no-files-found: warn
+      - name: Retain completed MP4
+        uses: actions/upload-artifact@v4
+        with:
+          name: muse-tiktok-${{ github.run_id }}
+          path: outputs/muse-tiktok/GLASS-FRUIT-TIKTOK.mp4
+          if-no-files-found: error
+      - name: Publish downloadable MP4
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="muse-tiktok-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Muse ガラス果物ASMR TikTok" --notes "イチゴ→リンゴ→スイカ→キウイ→ブドウ→レモン→桃。原音のみ。ループ・静止延長・速度変更なし。編集詳細はedit-report.json。映像の切断開始と音の最終確認は再生して行ってください。" outputs/muse-tiktok/GLASS-FRUIT-TIKTOK.mp4 outputs/muse-tiktok/edit-report.json
+          echo "MP4: https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/GLASS-FRUIT-TIKTOK.mp4" >> "$GITHUB_STEP_SUMMARY"
+      - name: Report incomplete footage
+        if: failure()
+        run: |
+          if [ -f outputs/muse-tiktok/edit-report.json ]; then
+            cat outputs/muse-tiktok/edit-report.json >> "$GITHUB_STEP_SUMMARY"
+          fi
